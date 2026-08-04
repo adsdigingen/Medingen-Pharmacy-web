@@ -1063,8 +1063,8 @@ export const PurchasesTab: React.FC<PurchasesTabProps> = ({
                       <th className="py-2 px-3 w-24 font-semibold">Batch No *</th>
                       <th className="py-2 px-3 w-24 font-semibold">Expiry Date *</th>
                       <th className="py-2 px-3 w-20 font-semibold">Cost (₹)</th>
+                      <th className="py-2 px-3 w-20 font-semibold">MRP (₹)</th>
                       <th className="py-2 px-3 w-20 font-semibold">Offline Sell (₹)</th>
-                      <th className="py-2 px-3 w-20 font-semibold">Online Sell (₹)</th>
                       <th className="py-2 px-3 w-16 font-semibold">GST (%)</th>
                       <th className="py-2 px-3 w-16 font-semibold">Qty</th>
                       <th className="py-2 px-3 w-16 font-semibold">Free</th>
@@ -1109,8 +1109,8 @@ export const PurchasesTab: React.FC<PurchasesTabProps> = ({
                           <input 
                             type="number" 
                             step="0.01"
-                            value={it.sellingPrice} 
-                            onChange={(e) => handleUpdateItem(idx, 'sellingPrice', parseFloat(e.target.value) || 0)} 
+                            value={it.mrp} 
+                            onChange={(e) => handleUpdateItem(idx, 'mrp', parseFloat(e.target.value) || 0)} 
                             className="w-full px-2 py-1 bg-gray-50 border border-gray-200 rounded text-gray-700 font-mono"
                           />
                         </td>
@@ -1118,8 +1118,8 @@ export const PurchasesTab: React.FC<PurchasesTabProps> = ({
                           <input 
                             type="number" 
                             step="0.01"
-                            value={it.mrp} 
-                            onChange={(e) => handleUpdateItem(idx, 'mrp', parseFloat(e.target.value) || 0)} 
+                            value={it.sellingPrice} 
+                            onChange={(e) => handleUpdateItem(idx, 'sellingPrice', parseFloat(e.target.value) || 0)} 
                             className="w-full px-2 py-1 bg-gray-50 border border-gray-200 rounded text-gray-700 font-mono"
                           />
                         </td>
