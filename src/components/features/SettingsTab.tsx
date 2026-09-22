@@ -325,7 +325,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                     <span className="font-bold text-gray-700 block text-xs">System Details</span>
                     <div className="space-y-1 text-gray-500 font-semibold">
                       <div>Software Version: <span className="text-gray-750">v1.2.4-stable</span></div>
-                      <div>Engine Runtime: <span className="text-gray-750">Electron / Next.js SPA</span></div>
+                      <div>Engine Runtime: <span className="text-gray-750">Next.js Web Client</span></div>
                       <div>Tailwind Style: <span className="text-gray-700">v4.0.0</span></div>
                     </div>
                   </div>

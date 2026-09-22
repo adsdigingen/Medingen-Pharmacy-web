@@ -325,116 +325,125 @@ export default function Home() {
   }, [currentTime]);
 
   const sidebarItems = useMemo(() => [
-    {
-      id: 'dashboard' as Tab,
-      title: 'Dashboard',
-      category: 'POS Registry',
-      roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST', 'CASHIER'],
-      icon: FiGrid
-    },
+    // Point of Sale Group
     {
       id: 'pos' as Tab,
-      title: 'Billing Desk',
-      category: 'POS Registry',
+      title: 'POS Billing Desk',
+      subtitle: 'Press F2 for quick cart',
+      category: 'Point of Sale',
       roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST', 'CASHIER'],
-      icon: HiOutlineShoppingCart
+      icon: HiOutlineShoppingCart,
+      shortcut: 'F2'
     },
     {
       id: 'counterSales' as Tab,
-      title: 'Counter Sales POS',
-      category: 'POS Registry',
+      title: 'Counter POS (Loose)',
+      subtitle: 'Loose tablets & strips',
+      category: 'Point of Sale',
       roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST', 'CASHIER'],
-      icon: HiOutlineShoppingCart
+      icon: LuBoxes
     },
     {
       id: 'history' as Tab,
       title: 'Invoices & Returns',
-      category: 'POS Registry',
+      subtitle: 'Sales history & credits',
+      category: 'Point of Sale',
       roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST', 'CASHIER'],
       icon: TbReceipt2
     },
+
+    // Pharmacy & Inventory Group
     {
       id: 'products' as Tab,
-      title: 'Products Catalog',
-      category: 'Stocks & Items',
+      title: 'Medicine Catalog',
+      subtitle: 'Master drug directory',
+      category: 'Pharmacy & Stock',
       roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST'],
       icon: FiPackage
     },
     {
       id: 'inventory' as Tab,
-      title: 'Inventory Ledgers',
-      category: 'Stocks & Items',
+      title: 'Stock & Batches',
+      subtitle: 'Ledgers & FEFO tracking',
+      category: 'Pharmacy & Stock',
       roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST'],
-      icon: LuBoxes
+      icon: LuBoxes,
+      badge: lowStockList.length > 0 ? `${lowStockList.length}` : undefined,
+      badgeColor: 'amber'
     },
     {
       id: 'counterProducts' as Tab,
-      title: 'Counter Products',
-      category: 'Stocks & Items',
+      title: 'Loose Inventory',
+      subtitle: 'Cut strips & unit stock',
+      category: 'Pharmacy & Stock',
       roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST'],
       icon: LuBoxes
     },
     {
       id: 'drugRegister' as Tab,
-      title: 'Drug Schedule Register',
-      category: 'Stocks & Items',
+      title: 'Schedule H1 / X',
+      subtitle: 'Controlled drug register',
+      category: 'Pharmacy & Stock',
       roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST', 'CASHIER'],
       icon: FiClipboard
     },
+
+    // Procurement Group
     {
       id: 'purchases' as Tab,
-      title: 'Purchases PO',
-      category: 'Stocks & Items',
+      title: 'Purchase Orders',
+      subtitle: 'Inward stock & GRN',
+      category: 'Procurement',
       roles: ['ADMIN', 'STORE_MANAGER'],
       icon: FiTruck
     },
     {
       id: 'suppliers' as Tab,
-      title: 'Suppliers',
-      category: 'Stocks & Items',
+      title: 'Vendor Directory',
+      subtitle: 'Suppliers & distributor MDM',
+      category: 'Procurement',
       roles: ['ADMIN', 'STORE_MANAGER'],
       icon: HiOutlineBuildingStorefront
     },
+
+    // Analytics & Admin Group
     {
-      id: 'sync' as Tab,
-      title: 'Sync Center',
-      category: 'Cloud Sync',
-      roles: ['ADMIN', 'STORE_MANAGER'],
-      icon: FiRefreshCw
-    },
-    {
-      id: 'owner' as Tab,
-      title: 'Owner Remote View',
-      category: 'Cloud Sync',
-      roles: ['ADMIN'],
-      icon: FiMonitor
+      id: 'dashboard' as Tab,
+      title: 'Executive Dashboard',
+      subtitle: 'KPIs & store summary',
+      category: 'Analytics & Admin',
+      roles: ['ADMIN', 'STORE_MANAGER', 'PHARMACIST', 'CASHIER'],
+      icon: FiGrid
     },
     {
       id: 'reports' as Tab,
-      title: 'Reports Analytics',
-      category: 'System Admin',
+      title: 'GST & Financials',
+      subtitle: 'Tax & revenue analytics',
+      category: 'Analytics & Admin',
       roles: ['ADMIN', 'STORE_MANAGER'],
       icon: FiBarChart2
     },
     {
-      id: 'settings' as Tab,
-      title: 'System Settings',
-      category: 'System Admin',
-      roles: ['ADMIN'],
-      icon: FiSettings
-    },
-    {
       id: 'admin' as Tab,
-      title: 'Admin Console',
-      category: 'System Admin',
+      title: 'Admin & Audit Logs',
+      subtitle: 'Staff access & security',
+      category: 'Analytics & Admin',
       roles: ['ADMIN'],
       icon: FiShield
+    },
+    {
+      id: 'settings' as Tab,
+      title: 'Pharmacy Settings',
+      subtitle: 'Station & GST config',
+      category: 'Analytics & Admin',
+      roles: ['ADMIN'],
+      icon: FiSettings
     }
-  ], []);
+  ], [lowStockList.length]);
 
   const sidebarCategories = useMemo(() => {
-    const categories = ['POS Registry', 'Stocks & Items', 'Cloud Sync', 'System Admin'];
-    return categories.map(cat => {
+    const categoryOrder = ['Point of Sale', 'Pharmacy & Stock', 'Procurement', 'Analytics & Admin'];
+    return categoryOrder.map(cat => {
       const items = sidebarItems.filter(item =>
         item.category === cat &&
         currentUser &&
@@ -534,26 +543,13 @@ export default function Home() {
       logTrace("[1/10] Renderer Loaded");
       reportStep(1, "Renderer Loaded", true);
 
-      // Step 2: Checking Electron API
-      logTrace("[Startup]\nFile: apps/desktop/renderer/src/app/page.tsx\nLine: 440\n[2/10] Checking Electron API...");
-      const hasElectronAPI = typeof window !== 'undefined' && (window as any).electronAPI !== undefined;
-      if (hasElectronAPI) {
-        logTrace("Electron API Available");
-        reportStep(2, "Checking Electron API", true);
-      } else {
-        logTrace("Electron API not available (Browser environment)");
-        reportStep(2, "Checking Electron API", false, "Electron API not available (running in browser)");
-      }
+      // Step 2: Web Client Environment
+      logTrace("[Startup] Web Client Initialized");
+      reportStep(2, "Web Client Initialized", true);
 
-      // Step 3: Checking IPC
-      logTrace("[Startup]\nFile: apps/desktop/renderer/src/app/page.tsx\nLine: 451\n[3/10] Checking IPC...");
-      if (hasElectronAPI) {
-        logTrace("IPC Connected");
-        reportStep(3, "Checking IPC", true);
-      } else {
-        logTrace("IPC Not Connected (Browser environment)");
-        reportStep(3, "Checking IPC", false, "IPC not available (running in browser)");
-      }
+      // Step 3: Checking API Connectivity
+      logTrace(`[Startup] Connecting to Backend API at ${API_BASE}...`);
+      reportStep(3, "Connecting to Backend API", true);
 
       // Step 4: Loading Local Settings
       logTrace("[Startup]\nFile: apps/desktop/renderer/src/app/page.tsx\nLine: 461\n[4/10] Loading Local Settings...");
@@ -2352,36 +2348,46 @@ ${startupReport.join("\n")}
       )}
 
       {/* Navigation Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 md:relative md:flex flex-col bg-primary border-r border-gray-200 transition-all duration-300 shrink-0 h-full ${sidebarCollapsed ? 'md:w-16' : 'md:w-64'
+      <aside className={`fixed inset-y-0 left-0 z-50 md:relative md:flex flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 shrink-0 h-full ${sidebarCollapsed ? 'md:w-18' : 'md:w-64'
         } ${isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0'
         }`}>
         {/* Top Logo / Brand section */}
-        <div className="p-4 border-b border-white/10 flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-12h.008v.008H12v-.008z" />
-            </svg>
-          </div>
-          {(!sidebarCollapsed || isMobileOpen) && (
-            <div className="truncate">
-              <h2 className="text-xs font-bold tracking-tight text-white truncate">{settingsForm.storeName || 'Medingen Pharmacy'}</h2>
-              <p className="text-[9px] text-white/50 font-bold uppercase tracking-widest leading-none">ERP Desk</p>
+        <div className="p-4 border-b border-slate-800/90 flex items-center justify-between shrink-0 bg-slate-950/40">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-lg shadow-black/30 border border-slate-700/60 p-1 overflow-hidden">
+              <img
+                src="/logo.png"
+                alt={settingsForm.storeName || "Company Logo"}
+                className="w-full h-full object-contain"
+              />
             </div>
-          )}
+            {(!sidebarCollapsed || isMobileOpen) && (
+              <div className="truncate">
+                <h2 className="text-xs font-bold tracking-tight text-slate-200 truncate">{settingsForm.storeName || 'Medingen Pharmacy'}</h2>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <p className="text-[9px] text-violet-600 font-bold uppercase tracking-widest leading-none">Clinical Suite</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Scrollable menu categories */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-6 scrollbar-thin scrollbar-thumb-white/10">
+        <div className="flex-1 overflow-y-auto p-3 space-y-5 scrollbar-thin scrollbar-thumb-slate-800">
           {sidebarCategories.map((cat, catIdx) => (
             <div key={catIdx}>
               {(!sidebarCollapsed || isMobileOpen) && (
-                <p className="text-[10px] font-bold text-white/60 tracking-wider uppercase px-3.5 mb-2.5">
-                  {cat.categoryName}
-                </p>
+                <div className="flex items-center justify-between px-3 mb-1.5">
+                  <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                    {cat.categoryName}
+                  </p>
+                </div>
               )}
               <nav className="space-y-1">
                 {cat.items.map(item => {
                   const Icon = item.icon;
+                  const isActive = activeTab === item.id;
                   return (
                     <button
                       key={item.id}
@@ -2389,15 +2395,32 @@ ${startupReport.join("\n")}
                         setActiveTab(item.id);
                         setIsMobileOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${(sidebarCollapsed && !isMobileOpen) ? 'justify-center px-0' : 'px-3.5'
-                        } ${activeTab === item.id
-                          ? 'bg-white/20 text-white border border-white/30 font-semibold'
-                          : 'text-white/80 hover:bg-white/10 hover:text-white'
+                      className={`w-full flex items-center justify-between py-2 rounded-xl text-xs font-semibold transition-all duration-200 group cursor-pointer ${(sidebarCollapsed && !isMobileOpen) ? 'justify-center px-0' : 'px-3'
+                        } ${isActive
+                          ? 'bg-primary text-white shadow-md shadow-violet-950/50 font-bold border border-primary'
+                          : 'text-slate-300 hover:bg-slate-800/80 hover:text-white border border-transparent'
                         }`}
                       title={item.title}
                     >
-                      <Icon className="transition-all duration-200 shrink-0" size={(sidebarCollapsed && !isMobileOpen) ? 18 : 20} />
-                      {(!sidebarCollapsed || isMobileOpen) && <span>{item.title}</span>}
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon className={`shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`} size={(sidebarCollapsed && !isMobileOpen) ? 18 : 17} />
+                        {(!sidebarCollapsed || isMobileOpen) && <span className={`truncate ${isActive ? 'text-white font-bold' : ''}`}>{item.title}</span>}
+                      </div>
+
+                      {(!sidebarCollapsed || isMobileOpen) && (
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {item.badge && (
+                            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${isActive ? 'bg-white/20 text-white border border-white/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'}`}>
+                              {item.badge}
+                            </span>
+                          )}
+                          {item.shortcut && (
+                            <kbd className={`hidden group-hover:inline-block px-1 py-0.2 text-[9px] font-mono rounded ${isActive ? 'bg-white/20 text-white border border-white/30' : 'text-slate-400 bg-slate-800 border border-slate-700'}`}>
+                              {item.shortcut}
+                            </kbd>
+                          )}
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -2405,87 +2428,71 @@ ${startupReport.join("\n")}
             </div>
           ))}
         </div>
-
-        {/* Pinned user profile & sign out at bottom */}
-        <div className="p-3 border-t border-white/10 bg-white/5 space-y-1 shrink-0">
-          <div className="flex items-center gap-2.5 px-2.5 py-2">
-            <div className="w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-xs shrink-0">
-              {currentUser?.username?.charAt(0).toUpperCase()}
-            </div>
-            {(!sidebarCollapsed || isMobileOpen) && (
-              <div className="text-left text-xs leading-none truncate flex-1">
-                <div className="font-bold text-white truncate">{currentUser?.username}</div>
-                <div className="text-[9px] text-white/50 mt-0.5">{currentUser?.role}</div>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center gap-3 py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-white/70 hover:bg-rose-500/20 hover:text-rose-200 cursor-pointer ${(sidebarCollapsed && !isMobileOpen) ? 'justify-center' : ''
-              }`}
-            title="Sign Out"
-          >
-            <FiLogOut size={16} className="shrink-0" />
-            {(!sidebarCollapsed || isMobileOpen) && <span>Sign Out</span>}
-          </button>
-        </div>
       </aside>
 
       {/* Right Column: Flexible Main View area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-slate-50">
 
         {/* Sticky Header with scrolling shadow check */}
-        <header className={`border-b border-gray-200 bg-white sticky top-0 z-30 px-5 py-3 flex items-center justify-between transition-shadow duration-200 ${isScrolled ? 'shadow-sm border-b-transparent' : ''
+        <header className={`border-b border-slate-200/80 bg-white/95 backdrop-blur-md sticky top-0 z-30 px-5 py-2.5 flex items-center justify-between transition-shadow duration-200 ${isScrolled ? 'shadow-xs border-b-slate-200' : ''
           }`}>
           {/* Header left: dynamic active tab title + toggle */}
           <div className="flex items-center gap-3">
             <button
               onClick={handleSidebarToggle}
-              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
+              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200"
               title="Toggle Sidebar"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-sm font-bold text-gray-850 tracking-tight leading-none">
-              {getTabTitle(activeTab)}
-            </h1>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold text-violet-700 bg-violet-50 border border-violet-200 px-2 py-0.5 rounded-md uppercase tracking-wider hidden sm:inline-block">
+                Medingen Rx
+              </span>
+              <span className="text-slate-300 hidden sm:inline-block">/</span>
+              <h1 className="text-sm sm:text-base font-bold text-slate-850 tracking-tight leading-none">
+                {getTabTitle(activeTab)}
+              </h1>
+            </div>
           </div>
 
           {/* Global Toolbar Controls */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
 
             {/* Quick billing screen trigger */}
             <button
               onClick={() => setActiveTab('pos')}
-              className="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-bold transition-all shadow-lg active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white text-xs font-bold transition-all shadow-sm shadow-violet-700/20 active:scale-95 flex items-center gap-1.5 cursor-pointer border border-violet-500/30"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
-              Billing Screen (F2)
+              <span>POS Billing</span>
+              <kbd className="hidden sm:inline-block px-1 py-0.2 text-[9px] bg-white/20 text-white rounded font-mono">F2</kbd>
             </button>
 
             {/* Universal search trigger button */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer hidden md:flex items-center gap-2"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-600 transition-colors cursor-pointer hidden md:flex items-center gap-2"
             >
-              <FiSearch className="text-gray-400 shrink-0" size={16} />
-              <span className="text-xs text-gray-400 font-semibold pr-2">Search ERP...</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-[10px] text-gray-400 font-bold">Ctrl+K</kbd>
+              <FiSearch className="text-slate-400 shrink-0" size={14} />
+              <span className="text-xs text-slate-500 font-medium">Search ERP...</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] text-slate-400 font-bold shadow-2xs">Ctrl+K</kbd>
             </button>
 
             {/* Notification bell center */}
             <div className="relative">
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors relative cursor-pointer"
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors relative cursor-pointer border border-transparent hover:border-slate-200"
+                title="Notifications"
               >
-                <FiBell className="shrink-0" size={20} />
+                <FiBell className="shrink-0" size={18} />
                 {unreadNotificationCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">
                     {unreadNotificationCount}
                   </span>
                 )}
@@ -2494,23 +2501,23 @@ ${startupReport.join("\n")}
               {notificationsOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setNotificationsOpen(false)} />
-                  <div className="absolute right-0 mt-2.5 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 overflow-hidden text-xs">
-                    <div className="p-3.5 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-                      <span className="font-bold text-gray-600 uppercase tracking-wider text-[10px]">Notification Center</span>
-                      <button onClick={clearAllNotifications} className="text-[10px] text-rose-600 hover:underline">Clear all</button>
+                  <div className="absolute right-0 mt-2.5 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden text-xs animate-scale-in">
+                    <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                      <span className="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Notification Center</span>
+                      <button onClick={clearAllNotifications} className="text-[10px] text-rose-600 hover:underline font-semibold">Clear all</button>
                     </div>
-                    <div className="max-h-64 overflow-y-auto divide-y divide-gray-100">
+                    <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
                       {notifications.length === 0 ? (
-                        <div className="p-6 text-center text-gray-400">No new updates or alerts.</div>
+                        <div className="p-6 text-center text-slate-400">No new updates or alerts.</div>
                       ) : (
                         notifications.map(n => (
-                          <div key={n.id} className={`p-3.5 hover:bg-gray-50 flex justify-between gap-2.5 items-start ${n.read ? 'opacity-60' : ''}`}>
+                          <div key={n.id} className={`p-3.5 hover:bg-slate-50 flex justify-between gap-2.5 items-start ${n.read ? 'opacity-60' : ''}`}>
                             <div className="space-y-0.5">
-                              <span className={`font-bold block ${n.type === 'STOCK_WARN' ? 'text-amber-400' : 'text-rose-600'}`}>{n.title}</span>
-                              <p className="text-gray-500 leading-normal">{n.message}</p>
+                              <span className={`font-bold block ${n.type === 'STOCK_WARN' ? 'text-amber-600' : 'text-rose-600'}`}>{n.title}</span>
+                              <p className="text-slate-600 leading-normal">{n.message}</p>
                             </div>
                             {!n.read && (
-                              <button onClick={() => markNotificationRead(n.id)} className="text-[9px] text-primary hover:underline shrink-0">Read</button>
+                              <button onClick={() => markNotificationRead(n.id)} className="text-[9px] text-violet-600 hover:underline shrink-0 font-bold">Read</button>
                             )}
                           </div>
                         ))
@@ -2525,16 +2532,16 @@ ${startupReport.join("\n")}
             <div className="relative">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2.5 p-1 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 p-1 pr-2 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-sm border border-primary/20">
+                <div className="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-700 flex items-center justify-center font-bold text-xs border border-violet-500/20">
                   {currentUser?.username?.charAt(0).toUpperCase()}
                 </div>
                 <div className="hidden lg:block text-left text-xs leading-none">
-                  <div className="font-bold text-gray-800">{currentUser?.username}</div>
-                  <div className="text-[9px] text-gray-400 mt-0.5">{currentUser?.role}</div>
+                  <div className="font-bold text-slate-800">{currentUser?.username}</div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">{currentUser?.role}</div>
                 </div>
-                <svg className="w-3.5 h-3.5 text-gray-400 hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5 text-slate-400 hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -2542,18 +2549,18 @@ ${startupReport.join("\n")}
               {profileDropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
-                  <div className="absolute right-0 mt-2.5 w-52 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 overflow-hidden text-xs text-gray-600">
-                    <div className="p-3 bg-gray-50 border-b border-gray-200 flex flex-col gap-0.5">
-                      <span className="font-bold text-gray-800 leading-none">{currentUser?.username}</span>
-                      <span className="text-[10px] text-gray-400">{currentUser?.role}</span>
+                  <div className="absolute right-0 mt-2.5 w-56 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden text-xs text-slate-600 animate-scale-in">
+                    <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex flex-col gap-0.5">
+                      <span className="font-bold text-slate-800 leading-none">{currentUser?.username}</span>
+                      <span className="text-[10px] text-violet-600 font-semibold">{currentUser?.role}</span>
                     </div>
                     <div className="p-1.5 space-y-0.5">
-                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('profile'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> My Profile</button>
-                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('password'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m-5-2a2 2 0 00-2 2m5 0a2 2 0 012 2m-5-2a2 2 0 00-2 2m5 4a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Change Password</button>
-                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('preferences'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg> Preferences</button>
-                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('about'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> About ERP</button>
-                      <div className="border-t border-gray-100 my-1.5" />
-                      <button onClick={handleLogout} className="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-500/10 text-rose-600 hover:text-rose-400 flex items-center gap-2"><FiLogOut className="w-4 h-4" /> Sign Out</button>
+                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('profile'); }} className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 flex items-center gap-2 cursor-pointer"><svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> My Profile</button>
+                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('password'); }} className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 flex items-center gap-2 cursor-pointer"><svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m-5-2a2 2 0 00-2 2m5 0a2 2 0 012 2m-5-2a2 2 0 00-2 2m5 4a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Change Password</button>
+                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('preferences'); }} className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 flex items-center gap-2 cursor-pointer"><svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg> Preferences</button>
+                      <button onClick={() => { setProfileDropdownOpen(false); setActiveDialog('about'); }} className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 flex items-center gap-2 cursor-pointer"><svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> About ERP</button>
+                      <div className="border-t border-slate-100 my-1" />
+                      <button onClick={handleLogout} className="w-full text-left px-3 py-2 rounded-xl hover:bg-rose-50 text-rose-600 hover:text-rose-700 flex items-center gap-2 cursor-pointer font-semibold"><FiLogOut className="w-4 h-4" /> Sign Out</button>
                     </div>
                   </div>
                 </>

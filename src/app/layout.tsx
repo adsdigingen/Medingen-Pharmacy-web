@@ -18,7 +18,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
         {/* Instant splash screen rendered as raw HTML before ANY JS loads */}
@@ -27,14 +27,14 @@ export default function RootLayout({
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: #020617;
+            background: #0f172a;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            font-family: 'Inter', system-ui, sans-serif;
-            font-size: 12px;
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+            font-size: 13px;
             color: #94a3b8;
             transition: opacity 0.3s ease;
           }
@@ -43,12 +43,12 @@ export default function RootLayout({
             pointer-events: none;
           }
           .circle-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(20, 184, 166, 0.15);
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(139, 92, 246, 0.2);
             border-radius: 50%;
-            border-top-color: #14b8a6;
-            animation: spin 0.8s ease-in-out infinite;
+            border-top-color: #8B5CF6;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           }
           @keyframes spin {
             to { transform: rotate(360deg); }
@@ -81,7 +81,7 @@ export default function RootLayout({
           console.log("[Layout] Startup trace initialized.");
         `}} />
       </head>
-      <body className="min-h-full flex flex-col bg-background" style={{ fontFamily: "'Open Sans', system-ui, sans-serif" }}>
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', system-ui, sans-serif" }}>
         {/* Instant splash: visible immediately, before React hydrates */}
         <div id="app-loader">
           <div className="circle-spinner"></div>

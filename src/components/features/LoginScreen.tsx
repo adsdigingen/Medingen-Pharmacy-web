@@ -102,10 +102,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         
         {/* Top brand header */}
         <div className="p-8 text-center border-b border-gray-200 bg-white/20">
-          <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/20 mb-3">
-            <svg className="w-7 h-7 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-12h.008v.008H12v-.008z" />
-            </svg>
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-lg shadow-teal-500/10 mb-3 p-1.5 overflow-hidden">
+            <img
+              src="/logo.png"
+              alt="Medingen Pharmacy Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-lg font-extrabold text-primary tracking-tight">
             Medingen Pharmacy

@@ -5,6 +5,8 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
   maxWidth?: string;
@@ -14,6 +16,8 @@ export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   title,
+  subtitle,
+  icon,
   children,
   footer,
   maxWidth = 'max-w-lg',
@@ -44,27 +48,36 @@ export const Modal: React.FC<ModalProps> = ({
       <div className="flex min-h-screen items-center justify-center p-4 text-center">
         {/* Backdrop overlay */}
         <div 
-          className="fixed inset-0 transition-opacity bg-black/40 backdrop-blur-sm" 
+          className="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm animate-fadeIn" 
           onClick={onClose}
         />
 
         {/* Modal content box */}
-        <div className={`relative inline-block w-full align-middle transition-all transform bg-white border border-gray-200 rounded-2xl shadow-2xl text-left my-8 ${maxWidth} animate-fadeIn`}>
-          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center rounded-t-2xl">
-            <h3 className="text-base font-bold text-gray-800 uppercase tracking-wider">{title}</h3>
+        <div className={`relative inline-block w-full align-middle transition-all transform bg-white border border-slate-200/80 rounded-2xl shadow-2xl text-left my-8 ${maxWidth} animate-scale-in overflow-hidden`}>
+          <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100 flex justify-between items-center">
+            <div className="flex items-center gap-3 min-w-0">
+              {icon && <div className="text-violet-600 shrink-0">{icon}</div>}
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-slate-850 tracking-tight leading-snug">{title}</h3>
+                {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+              </div>
+            </div>
             <button 
               type="button" 
-              className="text-gray-400 hover:text-gray-700 text-2xl font-semibold focus:outline-none transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 focus:outline-none transition-colors cursor-pointer"
               onClick={onClose}
+              title="Close dialog (Esc)"
             >
-              &times;
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-          <div className="px-6 py-5 text-sm text-gray-700">
+          <div className="px-6 py-5 text-sm text-slate-700 max-h-[calc(100vh-200px)] overflow-y-auto">
             {children}
           </div>
           {footer && (
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-row-reverse gap-3 rounded-b-2xl">
+            <div className="px-6 py-3.5 bg-slate-50/80 border-t border-slate-100 flex flex-row-reverse items-center gap-2.5">
               {footer}
             </div>
           )}
@@ -74,3 +87,4 @@ export const Modal: React.FC<ModalProps> = ({
     document.body
   );
 };
+

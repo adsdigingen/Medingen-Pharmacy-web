@@ -1,6 +1,7 @@
 {
-  "name": "@medingen/desktop-ui",
-  "version": "0.1.0",
+  "name": "@medingen/frontend",
+  "version": "1.0.0",
+  "description": "Medingen Pharmacy Next.js Frontend",
   "private": true,
   "scripts": {
     "dev": "next dev",
