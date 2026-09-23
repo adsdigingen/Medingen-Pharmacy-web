@@ -5,7 +5,7 @@ import { FiLogIn } from 'react-icons/fi';
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface LoginScreenProps {
-  onLoginSuccess: (user: { id: string; username: string; role: string }) => void;
+  onLoginSuccess: (user: { id: string; username: string; role: string; token?: string }) => void;
   localDbConnected: boolean;
   syncStatus: any;
   allUsers: any[];

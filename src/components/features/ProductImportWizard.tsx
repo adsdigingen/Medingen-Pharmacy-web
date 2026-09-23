@@ -17,6 +17,7 @@ interface ProductImportWizardProps {
 }
 
 const TARGET_FIELDS = [
+  { key: 'productId', label: 'Product ID', required: false, description: 'Product ID / Item Code / System ID' },
   { key: 'name', label: 'Product Name', required: true, description: 'Brand name or medicine name' },
   { key: 'genericName', label: 'Generic Name', required: false, description: 'Salt name or composition' },
   { key: 'brandName', label: 'Brand Name', required: false, description: 'Brand/manufacturer label' },
@@ -26,9 +27,10 @@ const TARGET_FIELDS = [
   { key: 'sku', label: 'SKU', required: false, description: 'Internal product/item code' },
   { key: 'hsnCode', label: 'HSN Code', required: false, description: 'GST HSN tariff code' },
   { key: 'gstPercentage', label: 'GST Percentage', required: false, description: 'Tax percentage (0-100)' },
-  { key: 'purchasePrice', label: 'Purchase Price', required: true, description: 'Cost price per unit' },
-  { key: 'mrp', label: 'MRP', required: true, description: 'Maximum retail price' },
+  { key: 'purchasePrice', label: 'Purchase Price', required: false, description: 'Cost price per unit (optional)' },
+  { key: 'mrp', label: 'MRP', required: false, description: 'Maximum retail price (optional)' },
   { key: 'sellingPrice', label: 'Selling Price', required: false, description: 'Retail price (optional)' },
+  { key: 'onlineSellingPrice', label: 'Online Price', required: false, description: 'Online store / e-commerce selling price' },
   { key: 'minStockLevel', label: 'Minimum Stock', required: false, description: 'Low stock notification level' },
   { key: 'rackLocation', label: 'Rack Location', required: false, description: 'Physical shelf placement' },
   { key: 'description', label: 'Description', required: false, description: 'Product details/remarks' },
@@ -1338,7 +1340,7 @@ export const ProductImportWizard: React.FC<ProductImportWizardProps> = ({
                         <th className="py-3 px-4">Composition</th>
                         <th className="py-3 px-4 font-mono">Barcode / SKU</th>
                         <th className="py-3 px-4 text-right">Purchase (₹)</th>
-                        <th className="py-3 px-4 text-right">MRP (₹)</th>
+                        <th className="py-3 px-4 text-right">MRP / Online (₹)</th>
                         <th className="py-3 px-4 text-center">Status</th>
                       </tr>
                     </thead>
@@ -1356,11 +1358,21 @@ export const ProductImportWizard: React.FC<ProductImportWizardProps> = ({
                           </td>
                           <td className="py-3 px-4 text-muted font-medium max-w-xs truncate">{row.genericName || '-'}</td>
                           <td className="py-3 px-4 font-mono text-[10px] text-gray-500 leading-relaxed">
+                            {row.productId && <div className="text-violet-600 font-bold">ID: {row.productId}</div>}
                             <div>Bar: {row.barcode || '-'}</div>
                             <div className="text-gray-400">SKU: {row.sku || '-'}</div>
                           </td>
-                          <td className="py-3 px-4 text-right font-mono text-gray-700">₹{parseFloat(row.cost || 0).toFixed(2)}</td>
-                          <td className="py-3 px-4 text-right font-mono text-gray-700">₹{parseFloat(row.mrp || 0).toFixed(2)}</td>
+                          <td className="py-3 px-4 text-right font-mono text-gray-700">
+                            {parseFloat(row.cost || 0) > 0 ? `₹${parseFloat(row.cost).toFixed(2)}` : <span className="text-gray-400">-</span>}
+                          </td>
+                          <td className="py-3 px-4 text-right font-mono text-gray-700">
+                            <div>{parseFloat(row.mrp || 0) > 0 ? `₹${parseFloat(row.mrp).toFixed(2)}` : <span className="text-gray-400">-</span>}</div>
+                            {parseFloat(row.onlineSellingPrice || 0) > 0 && (
+                              <div className="text-[10px] text-teal-600 font-semibold mt-0.5">
+                                Online: ₹{parseFloat(row.onlineSellingPrice).toFixed(2)}
+                              </div>
+                            )}
+                          </td>
                           <td className="py-3 px-4 text-center select-none">
                             <Badge 
                               variant={row.status === 'DUPLICATE' ? 'warning' : row.status === 'INVALID' ? 'danger' : 'success'}

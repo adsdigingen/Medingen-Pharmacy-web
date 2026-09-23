@@ -221,7 +221,21 @@ export default function Home() {
   const [reportsLoading, setReportsLoading] = useState<boolean>(false);
 
   // --- SYSTEM SETTINGS STATE ---
-  const [settingsForm, setSettingsForm] = useState<any>({ storeName: 'Medingen Pharmacy', gstin: '', phone: '', email: '', address: '', invoicePrefix: 'INV-', poPrefix: 'PO-', printerType: '80mm', backupInterval: 'DAILY' });
+  const [settingsForm, setSettingsForm] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('medingen_settings');
+        if (cached) return JSON.parse(cached);
+      } catch (_) {}
+    }
+    return { storeName: 'Medingen Pharmacy', gstin: '', phone: '', email: '', address: '', invoicePrefix: 'INV-', poPrefix: 'PO-', printerType: '80mm', backupInterval: 'DAILY' };
+  });
+  const [setupWizardDismissed, setSetupWizardDismissed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('medingen_onboarding_completed') === 'true';
+    }
+    return false;
+  });
   const [settingsLoading, setSettingsLoading] = useState<boolean>(false);
   const [licenseInfo, setLicenseInfo] = useState<any>(null);
   const [activationKey, setActivationKey] = useState<string>('');
@@ -533,7 +547,22 @@ export default function Home() {
         const cached = localStorage.getItem('medingen_session');
         if (cached) {
           const parsed = JSON.parse(cached);
-          startupToken = parsed.token;
+          if (parsed?.token) {
+            try {
+              const parts = parsed.token.split('.');
+              if (parts.length === 3) {
+                const payload = JSON.parse(atob(parts[1]));
+                if (payload.exp && Math.floor(Date.now() / 1000) > payload.exp) {
+                  logTrace("[Startup] Cached session token has expired. Clearing session.");
+                  localStorage.removeItem('medingen_session');
+                } else {
+                  startupToken = parsed.token;
+                }
+              }
+            } catch (_) {
+              startupToken = parsed.token;
+            }
+          }
         }
       } catch (_) { }
 
@@ -659,8 +688,9 @@ ${startupReport.join("\n")}
 
       // Exit loading state and dismiss splash screen in finally block
       try {
-        if (cachedSession) {
-          const parsedUser = JSON.parse(cachedSession);
+        const activeCachedSession = localStorage.getItem('medingen_session');
+        if (activeCachedSession) {
+          const parsedUser = JSON.parse(activeCachedSession);
           setCurrentUser(parsedUser);
 
           // Read tab parameter from URL query if logged in
@@ -1702,7 +1732,18 @@ ${startupReport.join("\n")}
       });
       if (res.ok) {
         const envelope = await res.json();
-        setSettingsForm(envelope.data);
+        if (envelope?.data) {
+          setSettingsForm(envelope.data);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('medingen_settings', JSON.stringify(envelope.data));
+              if (envelope.data.gstin && envelope.data.gstin.trim() !== '') {
+                localStorage.setItem('medingen_onboarding_completed', 'true');
+                setSetupWizardDismissed(true);
+              }
+            } catch (_) {}
+          }
+        }
         logTrace("[Medingen Init] fetchSettings data set successfully");
       } else {
         logTrace("[Medingen Init] fetchSettings returned non-ok status: " + res.status);
@@ -1725,7 +1766,18 @@ ${startupReport.join("\n")}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settingsForm)
       });
-      if (res.ok) alert("Settings saved successfully!");
+      if (res.ok) {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('medingen_settings', JSON.stringify(settingsForm));
+            if (settingsForm.gstin && settingsForm.gstin.trim() !== '') {
+              localStorage.setItem('medingen_onboarding_completed', 'true');
+              setSetupWizardDismissed(true);
+            }
+          } catch (_) {}
+        }
+        alert("Settings saved successfully!");
+      }
     } catch (e) {
       alert("Settings save failed");
     } finally {
@@ -2315,7 +2367,7 @@ ${startupReport.join("\n")}
       <LoginScreen
         onLoginSuccess={(user) => {
           setCurrentUser(user);
-          fetchSettings(); // Refresh settings details upon login
+          fetchSettings(user.token); // Refresh settings details upon login with fresh token
         }}
         localDbConnected={localDbConnected}
         syncStatus={syncStatus}
@@ -2324,7 +2376,17 @@ ${startupReport.join("\n")}
     );
   }
 
-  const showSetupWizard = currentUser && currentUser.role === 'ADMIN' && (!settingsForm || !settingsForm.gstin || settingsForm.gstin.trim() === '');
+  const isAlreadyOnboarded = Boolean(
+    setupWizardDismissed ||
+    (typeof window !== 'undefined' && localStorage.getItem('medingen_onboarding_completed') === 'true') ||
+    (settingsForm?.gstin && settingsForm.gstin.trim() !== '')
+  );
+
+  const showSetupWizard = Boolean(
+    currentUser &&
+    currentUser.role === 'ADMIN' &&
+    !isAlreadyOnboarded
+  );
 
   return (
     <div className={`h-screen w-screen overflow-hidden bg-white text-gray-800 flex font-sans antialiased ${density === 'compact' ? 'density-compact' : 'density-comfortable'}`}>
@@ -2334,6 +2396,21 @@ ${startupReport.join("\n")}
           setSettingsForm={setSettingsForm}
           onComplete={async (updatedSettings) => {
             setSettingsForm(updatedSettings);
+            setSetupWizardDismissed(true);
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem('medingen_onboarding_completed', 'true');
+                localStorage.setItem('medingen_settings', JSON.stringify(updatedSettings));
+              } catch (_) {}
+            }
+          }}
+          onDismiss={() => {
+            setSetupWizardDismissed(true);
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem('medingen_onboarding_completed', 'true');
+              } catch (_) {}
+            }
           }}
           currentUser={currentUser}
         />
@@ -2700,6 +2777,7 @@ ${startupReport.join("\n")}
 
           {activeTab === 'settings' && (
             <SettingsTab
+              API_BASE={API_BASE}
               settingsForm={settingsForm}
               setSettingsForm={setSettingsForm}
               settingsLoading={settingsLoading}

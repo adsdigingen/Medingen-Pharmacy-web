@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -6,6 +6,7 @@ interface SetupWizardModalProps {
   settingsForm: any;
   setSettingsForm: (val: any) => void;
   onComplete: (updatedSettings: any) => Promise<void>;
+  onDismiss?: () => void;
   currentUser: any;
 }
 
@@ -13,6 +14,7 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
   settingsForm,
   setSettingsForm,
   onComplete,
+  onDismiss,
   currentUser,
 }) => {
   const [step, setStep] = useState(1);
@@ -20,12 +22,23 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
   const [error, setError] = useState('');
 
   // Form Fields State
-  const [storeName, setStoreName] = useState(settingsForm.storeName || '');
-  const [phone, setPhone] = useState(settingsForm.phone || '');
-  const [email, setEmail] = useState(settingsForm.email || '');
-  const [address, setAddress] = useState(settingsForm.address || '');
-  const [gstin, setGstin] = useState(settingsForm.gstin || '');
+  const [storeName, setStoreName] = useState(settingsForm?.storeName || '');
+  const [phone, setPhone] = useState(settingsForm?.phone || '');
+  const [email, setEmail] = useState(settingsForm?.email || '');
+  const [address, setAddress] = useState(settingsForm?.address || '');
+  const [gstin, setGstin] = useState(settingsForm?.gstin || '');
   const [drugLicense, setDrugLicense] = useState('');
+
+  useEffect(() => {
+    if (settingsForm) {
+      if (settingsForm.storeName && !storeName) setStoreName(settingsForm.storeName);
+      if (settingsForm.phone && !phone) setPhone(settingsForm.phone);
+      if (settingsForm.email && !email) setEmail(settingsForm.email);
+      if (settingsForm.address && !address) setAddress(settingsForm.address);
+      if (settingsForm.gstin && !gstin) setGstin(settingsForm.gstin);
+      if (settingsForm.printerType && !printerType) setPrinterType(settingsForm.printerType);
+    }
+  }, [settingsForm]);
   
   // Admin Password
   const [adminPassword, setAdminPassword] = useState('');
@@ -112,25 +125,31 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
         // Re-auth failed — fall back to existing token and let the API calls surface the error
       }
 
-      // 1. Update Admin Password
-      const passwordRes = await fetch(`${API_BASE}/users-management/${currentUser.id}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${activeToken}`
-        },
-        body: JSON.stringify({
-          passwordHash: adminPassword,
-        }),
-      });
-
-      if (!passwordRes.ok) {
-        const errBody = await passwordRes.json().catch(() => ({}));
-        throw new Error(errBody?.message || 'Failed to update administrator password.');
+      // 1. Update Admin Password (if provided)
+      if (adminPassword.trim()) {
+        try {
+          const passwordRes = await fetch(`${API_BASE}/users-management/${currentUser.id}`, {
+            method: 'PUT',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${activeToken}`
+            },
+            body: JSON.stringify({
+              passwordHash: adminPassword,
+            }),
+          });
+          if (!passwordRes.ok) {
+            console.warn('Password update non-ok, proceeding with settings update');
+          }
+        } catch (pwErr) {
+          console.warn('Password update skipped or failed:', pwErr);
+        }
       }
 
       // 2. Format Address with Drug License info to prevent database schema modification
-      const formattedAddress = `${address.trim()} (Drug Lic: ${drugLicense.trim()})`;
+      const formattedAddress = drugLicense.trim() 
+        ? `${address.trim()} (Drug Lic: ${drugLicense.trim()})`
+        : address.trim();
 
       // 3. Save Settings to Backend
       const settingsRes = await fetch(`${API_BASE}/system-settings`, {
@@ -157,22 +176,19 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
 
       const settingsData = (await settingsRes.json()).data;
       
-      // 4. Update local Sync settings to cloudUrl
-      const syncSettingsRes = await fetch(`${API_BASE}/sync/settings`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${activeToken}`
-        },
-        body: JSON.stringify({
-          cloudApiUrl: cloudUrl.trim()
-        })
-      });
-
-      if (!syncSettingsRes.ok) {
-        const errBody = await syncSettingsRes.json().catch(() => ({}));
-        throw new Error(errBody?.message || 'Failed to save cloud sync target URL configuration.');
-      }
+      // 4. Update local Sync settings to cloudUrl (non-blocking)
+      try {
+        await fetch(`${API_BASE}/sync/settings`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeToken}`
+          },
+          body: JSON.stringify({
+            cloudApiUrl: cloudUrl.trim()
+          })
+        }).catch(() => null);
+      } catch (_) {}
 
       await fetch(`${API_BASE}/sync/force`, {
         method: 'POST',
@@ -181,6 +197,13 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
           'Authorization': `Bearer ${activeToken}`
         }
       }).catch(() => null); // Silent pass
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('medingen_onboarding_completed', 'true');
+          localStorage.setItem('medingen_settings', JSON.stringify(settingsData));
+        } catch (_) {}
+      }
 
       await onComplete(settingsData);
     } catch (err: any) {
@@ -192,17 +215,29 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
 
 
   return (
-    <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-md flex items-center justify-center p-4 font-sans text-xs text-muted">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 font-sans text-xs text-gray-700 animate-fadeIn">
       <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden animate-fadeIn relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.03)_0%,transparent_60%)] pointer-events-none" />
         
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 bg-white/30 flex justify-between items-center relative z-10">
+        <div className="p-6 border-b border-gray-200 bg-white/40 flex justify-between items-center relative z-10">
           <div>
             <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wider">🚀 Medingen First-Time Setup Wizard</h2>
             <p className="text-[10px] text-gray-500 mt-1">Configure your pharmacy instance before launching terminal dashboards.</p>
           </div>
-          <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded">STEP {step} OF 4</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-teal-600 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">STEP {step} OF 4</span>
+            {onDismiss && (
+              <button
+                type="button"
+                onClick={onDismiss}
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors text-sm font-bold cursor-pointer"
+                title="Dismiss setup wizard"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Progress Bar */}
@@ -382,6 +417,14 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
                 className="px-4 py-2 border border-gray-200 hover:bg-gray-50 text-gray-600 font-bold rounded-lg cursor-pointer transition-all disabled:opacity-50"
               >
                 Back
+              </button>
+            ) : onDismiss ? (
+              <button
+                type="button"
+                onClick={onDismiss}
+                className="text-[11px] text-gray-500 hover:text-gray-800 underline font-semibold cursor-pointer py-2 px-1"
+              >
+                Skip for now
               </button>
             ) : (
               <div />
