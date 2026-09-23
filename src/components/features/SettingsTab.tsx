@@ -846,7 +846,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                         <span className="text-slate-300">•</span>
                         <span className="text-[11px] font-mono text-slate-400">v1.2 Headless API</span>
                       </div>
-                      <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+                      <h3 className="text-xl font-bold text-gray-900 tracking-tight">
                         Headless Billing API & Key Management
                       </h3>
                       <p className="text-slate-500 text-xs max-w-2xl leading-relaxed">
@@ -974,7 +974,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                         <KeyIcon className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 text-sm tracking-tight">API Credentials & Secret Vault</h4>
+                        <h4 className="font-bold text-gray-900 text-sm tracking-tight">API Credentials & Secret Vault</h4>
                         <p className="text-slate-500 text-xs mt-0.5">
                           Server token required by the Medingen Platform to authorize headless invoice generation.
                         </p>
@@ -1156,7 +1156,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                         <TerminalIcon className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 text-sm tracking-tight">Integration Documentation</h4>
+                        <h4 className="font-bold text-gray-900 text-sm tracking-tight">Integration Documentation</h4>
                         <p className="text-slate-500 text-xs mt-0.5">
                           Technical specifications for server-to-server billing and real-time inventory synchronization.
                         </p>
@@ -1172,8 +1172,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                           onClick={() => setActiveCodeTab(tab)}
                           className={`px-3 py-1 rounded-lg font-semibold cursor-pointer transition-all ${
                             activeCodeTab === tab
-                              ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60'
-                              : 'text-slate-500 hover:text-slate-800'
+                              ? 'bg-white text-black font-bold shadow-xs border border-white'
+                              : 'text-gray-400 hover:text-white'
                           }`}
                         >
                           {tab === 'curl' ? 'cURL' : tab === 'node' ? 'Node.js' : tab === 'python' ? 'Python' : 'JSON Payload'}
@@ -1559,7 +1559,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                   {/* Architecture Pillars */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                     <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
-                      <span className="font-bold text-slate-900 block text-xs flex items-center gap-1.5">
+                      <span className="font-bold text-gray-900 block text-xs flex items-center gap-1.5">
                         <LockIcon className="w-3.5 h-3.5 text-primary" />
                         Zero Plaintext Persistence
                       </span>
@@ -1569,7 +1569,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                     </div>
 
                     <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
-                      <span className="font-bold text-slate-900 block text-xs flex items-center gap-1.5">
+                      <span className="font-bold text-gray-900 block text-xs flex items-center gap-1.5">
                         <ActivityIcon className="w-3.5 h-3.5 text-primary" />
                         Automated FEFO Allocation
                       </span>
@@ -1579,7 +1579,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                     </div>
 
                     <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
-                      <span className="font-bold text-slate-900 block text-xs flex items-center gap-1.5">
+                      <span className="font-bold text-gray-900 block text-xs flex items-center gap-1.5">
                         <ShieldCheckIcon className="w-3.5 h-3.5 text-primary" />
                         Idempotent Order Handling
                       </span>
@@ -1689,7 +1689,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                 <RefreshCwIcon className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-sm text-slate-900">Regenerate API Key?</h3>
+                <h3 className="font-bold text-sm text-gray-900">Regenerate API Key?</h3>
                 <p className="text-slate-600 text-xs leading-relaxed">
                   The current key will immediately stop working. The Medingen Platform must be updated with the new key before API requests can continue.
                 </p>
@@ -1735,7 +1735,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                 <ShieldAlertIcon className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-sm text-slate-900">Revoke API Key?</h3>
+                <h3 className="font-bold text-sm text-gray-900">Revoke API Key?</h3>
                 <p className="text-slate-600 text-xs leading-relaxed">
                   The Medingen Platform will no longer be able to generate invoices through this integration.
                 </p>
