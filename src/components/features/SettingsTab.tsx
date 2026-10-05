@@ -1400,25 +1400,53 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                                 ? JSON.stringify(
                                     {
                                       success: true,
-                                      message: 'Bill created successfully',
-                                      data: {
-                                        billId: 'a810f24e-72bc-4fa1-84cd-c7ec51261d71',
+                                      status: 'GENERATED',
+                                      orderId: '10473',
+                                      invoiceId: 'a810f24e-72bc-4fa1-84cd-c7ec51261d71',
+                                      invoiceNumber: 'INV-2026-00412',
+                                      totalAmount: 79.36,
+                                      pdfUrl: null,
+                                      bill: {
                                         billNumber: 'INV-2026-00412',
-                                        invoiceType: 'TAX',
-                                        totalAmount: 40.0,
-                                        discountAmount: 0.0,
-                                        gstAmount: 4.28,
-                                        netAmount: 40.0,
-                                        status: 'COMPLETED',
+                                        doctor: {
+                                          name: 'Dr. Ramya',
+                                        },
+                                        customer: {
+                                          name: 'GUNASEELAN',
+                                          phone: '8098697141',
+                                          email: '',
+                                          address: '10, Kamatchi Amman Kovil, Chennai',
+                                        },
                                         items: [
                                           {
-                                            productId: 'd9029161-6e2e-46c5-a7ea-a5778dd21080',
-                                            batchNumber: 'BCH-2026-09',
-                                            expiryDate: '2027-11-30',
+                                            productId: '33944',
+                                            productName: 'DAPAREST 10MG',
                                             quantity: 2,
-                                            sellingPrice: 20.0,
+                                            originalPrice: 150,
+                                            price: 23.75,
+                                            discountPercent: 20,
+                                            batchNumber: 'ACTUAL-BATCH-001',
+                                            expiryDate: '2027-08-31',
+                                            allocations: [
+                                              {
+                                                quantity: 2,
+                                                batchNumber: 'ACTUAL-BATCH-001',
+                                                expiryDate: '2027-08-31',
+                                              },
+                                            ],
                                           },
                                         ],
+                                        payment: {
+                                          method: 'COD',
+                                          amount: 79.36,
+                                        },
+                                        offer: 'Stay Consistent. Save More. – Up to 20% OFF',
+                                        discount: {
+                                          percent: 'Up To 20% OFF',
+                                        },
+                                        totals: {
+                                          totalAmount: 79.36,
+                                        },
                                       },
                                     },
                                     null,
@@ -1427,9 +1455,9 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                                 : JSON.stringify(
                                     {
                                       success: false,
-                                      message: 'One or more products were not found in local pharmacy catalog',
-                                      errorCode: 'PRODUCT_NOT_FOUND',
-                                      missingProductIds: ['d9029161-6e2e-46c5-a7ea-a5778dd21080'],
+                                      status: 'PRODUCT_NOT_FOUND',
+                                      orderId: '10473',
+                                      missingProducts: ['33944'],
                                     },
                                     null,
                                     2,
@@ -1458,25 +1486,53 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                             {JSON.stringify(
                               {
                                 success: true,
-                                message: 'Bill created successfully',
-                                data: {
-                                  billId: 'a810f24e-72bc-4fa1-84cd-c7ec51261d71',
+                                status: 'GENERATED',
+                                orderId: '10473',
+                                invoiceId: 'a810f24e-72bc-4fa1-84cd-c7ec51261d71',
+                                invoiceNumber: 'INV-2026-00412',
+                                totalAmount: 79.36,
+                                pdfUrl: null,
+                                bill: {
                                   billNumber: 'INV-2026-00412',
-                                  invoiceType: 'TAX',
-                                  totalAmount: 40.0,
-                                  discountAmount: 0.0,
-                                  gstAmount: 4.28,
-                                  netAmount: 40.0,
-                                  status: 'COMPLETED',
+                                  doctor: {
+                                    name: 'Dr. Ramya',
+                                  },
+                                  customer: {
+                                    name: 'GUNASEELAN',
+                                    phone: '8098697141',
+                                    email: '',
+                                    address: '10, Kamatchi Amman Kovil, Chennai',
+                                  },
                                   items: [
                                     {
-                                      productId: 'd9029161-6e2e-46c5-a7ea-a5778dd21080',
-                                      batchNumber: 'BCH-2026-09',
-                                      expiryDate: '2027-11-30',
+                                      productId: '33944',
+                                      productName: 'DAPAREST 10MG',
                                       quantity: 2,
-                                      sellingPrice: 20.0,
+                                      originalPrice: 150,
+                                      price: 23.75,
+                                      discountPercent: 20,
+                                      batchNumber: 'ACTUAL-BATCH-001',
+                                      expiryDate: '2027-08-31',
+                                      allocations: [
+                                        {
+                                          quantity: 2,
+                                          batchNumber: 'ACTUAL-BATCH-001',
+                                          expiryDate: '2027-08-31',
+                                        },
+                                      ],
                                     },
                                   ],
+                                  payment: {
+                                    method: 'COD',
+                                    amount: 79.36,
+                                  },
+                                  offer: 'Stay Consistent. Save More. – Up to 20% OFF',
+                                  discount: {
+                                    percent: 'Up To 20% OFF',
+                                  },
+                                  totals: {
+                                    totalAmount: 79.36,
+                                  },
                                 },
                               },
                               null,
@@ -1490,9 +1546,9 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                             {JSON.stringify(
                               {
                                 success: false,
-                                message: 'One or more products were not found in local pharmacy catalog',
-                                errorCode: 'PRODUCT_NOT_FOUND',
-                                missingProductIds: ['d9029161-6e2e-46c5-a7ea-a5778dd21080'],
+                                status: 'PRODUCT_NOT_FOUND',
+                                orderId: '10473',
+                                missingProducts: ['33944'],
                               },
                               null,
                               2,
