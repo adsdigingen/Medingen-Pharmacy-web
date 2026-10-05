@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../common/Button';
 import { FiLogIn } from 'react-icons/fi';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001');
+import { resolveApiBase } from '../../lib/api-config';
+
+const API_BASE = resolveApiBase();
 
 interface LoginScreenProps {
   onLoginSuccess: (user: { id: string; username: string; role: string; token?: string }) => void;

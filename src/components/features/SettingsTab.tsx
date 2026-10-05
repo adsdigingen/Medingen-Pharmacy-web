@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../common/Button';
+import { resolveApiBase } from '../../lib/api-config';
 
 // ============================================================================
 // UI/UX Pro Max Pixel-Perfect Inline SVGs (No Raw Emojis)
@@ -203,11 +204,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
     }
   };
 
-  const rawApiBase =
-    API_BASE ||
-    (typeof window !== 'undefined'
-      ? (window as any).NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001')
-      : (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001'));
+  const rawApiBase = API_BASE || resolveApiBase();
   const effectiveApiBase = rawApiBase.replace(/\/api\/?$/, '');
 
   // Deep linking to ?section=integrations

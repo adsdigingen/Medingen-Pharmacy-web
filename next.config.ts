@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === 'production';
 const isVercel = process.env.VERCEL === '1';
 
+const BACKEND_INTERNAL_URL = process.env.BACKEND_INTERNAL_URL || "http://65.0.176.164";
+
 const nextConfig: NextConfig = {
   output: isVercel ? undefined : 'export',
   assetPrefix: isProd && !isVercel ? './' : undefined,
@@ -20,7 +22,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://65.0.176.164/:path*",
+        destination: `${BACKEND_INTERNAL_URL}/:path*`,
       },
     ];
   },
