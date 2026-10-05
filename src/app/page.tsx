@@ -26,7 +26,7 @@ import DrugRegisterTab from '../components/features/DrugRegisterTab';
 import CounterProductsTab from '../components/features/CounterProductsTab';
 import CounterSalesTab from '../components/features/CounterSalesTab';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001');
 
 type Tab = 'dashboard' | 'pos' | 'history' | 'reports' | 'settings' | 'admin' | 'purchases' | 'inventory' | 'products' | 'suppliers' | 'sync' | 'owner' | 'drugRegister' | 'counterProducts' | 'counterSales';
 

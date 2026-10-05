@@ -203,11 +203,12 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
     }
   };
 
-  const effectiveApiBase =
+  const rawApiBase =
     API_BASE ||
     (typeof window !== 'undefined'
-      ? (window as any).NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      : 'http://localhost:3001');
+      ? (window as any).NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001')
+      : (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001'));
+  const effectiveApiBase = rawApiBase.replace(/\/api\/?$/, '');
 
   // Deep linking to ?section=integrations
   useEffect(() => {

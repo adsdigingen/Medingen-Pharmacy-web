@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001');
 
 interface SetupWizardModalProps {
   settingsForm: any;
@@ -45,7 +45,7 @@ export const SetupWizardModal: React.FC<SetupWizardModalProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Integration
-  const [cloudUrl, setCloudUrl] = useState(process.env.NEXT_PUBLIC_CLOUD_API_URL || 'https://65.0.176.164');
+  const [cloudUrl, setCloudUrl] = useState(process.env.NEXT_PUBLIC_CLOUD_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001'));
   const [printerType, setPrinterType] = useState('80mm');
 
   const validateStep = () => {

@@ -4,7 +4,7 @@ import {
   FiAlertTriangle, FiPlus, FiX, FiCheck, FiUser, FiFileText, FiShield
 } from 'react-icons/fi';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001');
 
 interface DrugRegisterTabProps {
   currentUser: any;

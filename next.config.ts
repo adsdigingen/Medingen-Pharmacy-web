@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
     workerThreads: false,
     cpus: 1,
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://65.0.176.164/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
